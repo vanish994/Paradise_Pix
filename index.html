@@ -2,12 +2,52 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Painel Pix Dinâmico</title>
+  <title>Pix Dinâmico + Copiar Link</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 60px auto; }
+    input, button { padding: 10px; margin-top: 10px; width: 100%; font-size: 1rem; }
+    .output { margin-top: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9; }
+  </style>
 </head>
-<body style="font-family:sans-serif; max-width: 600px; margin: 60px auto;">
+<body>
   <h1>📲 Gerador de Pix Dinâmico</h1>
-  <p>Use a URL abaixo passando o valor em centavos e uma referência opcional:</p>
-  <pre>gerar_pix_dinamico.php?valor=7500&ref=pedidoXYZ</pre>
-  <p>Exemplo: <strong>R$ 75,00</strong> com identificador <em>pedidoXYZ</em>.</p>
+  <p>Digite o valor (em centavos) e uma referência (opcional):</p>
+
+  <input type="number" id="valor" placeholder="Ex: 7500 (R$ 75,00)">
+  <input type="text" id="ref" placeholder="Ref: pedido123 (opcional)">
+  <button onclick="gerar()">Gerar Link Pix</button>
+
+  <div class="output" id="resultado" style="display:none;">
+    <strong>Link gerado:</strong>
+    <p><a id="linkPix" href="#" target="_blank"></a></p>
+    <button onclick="copiar()">📋 Copiar Link</button>
+  </div>
+
+  <script>
+    function gerar() {
+      const valor = document.getElementById('valor').value;
+      const ref = document.getElementById('ref').value;
+      const url = `gerar_pix_dinamico.php?valor=${valor}&ref=${ref}`;
+
+      fetch(url).then(r => r.text()).then(html => {
+        const link = html.match(/href='([^']+)'/);
+        if (link) {
+          const checkout = link[1];
+          document.getElementById('linkPix').textContent = checkout;
+          document.getElementById('linkPix').href = checkout;
+          document.getElementById('resultado').style.display = 'block';
+        } else {
+          alert("Erro ao gerar Pix:
+" + html);
+        }
+      });
+    }
+
+    function copiar() {
+      const texto = document.getElementById('linkPix').href;
+      navigator.clipboard.writeText(texto);
+      alert("Link copiado para a área de transferência!");
+    }
+  </script>
 </body>
 </html>
